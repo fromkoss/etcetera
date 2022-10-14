@@ -1,0 +1,32 @@
+<script>
+window.productBadges = {
+  {%- for badge in section.blocks -%}
+    "{{ badge.settings.tag_assign }}": {{ badge.settings.badge_text | json }},
+  {%- endfor -%}
+};
+</script>
+
+{% schema %}
+  {
+    "name": "Global Badges",
+    "settings": [],
+    "blocks": [
+      {
+        "name": "Badge",
+        "type": "badge",
+        "settings": [
+          {
+            "type": "text",
+            "id": "tag_assign",
+            "label": "Tag to Use Badge"
+          },
+          {
+            "type": "text",
+            "id": "badge_text",
+            "label": "Badge Text"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -78,84 +78,15 @@
     <div class="grid__item medium-up--one-half{% if product.images.size == 0%} medium-up--push-one-half{% endif %}">
       <div class="product-single__meta small--text-center">
         <h1 class="product-single__title" itemprop="name">{{ product.title }}</h1>
-
+        <script src="{{ 'product.min.js' | asset_url }}" defer="defer"></script>
+        <script id="product-main-data" type="application/json">
+          {% render 'product-json', product: product %}
+        </script>
+        <div id="product-main"></div>
         {% if section.settings.vendor_show %}
           <p class="product-single__vendor" itemprop="brand">{{ product.vendor }}</p>
         {% endif %}
 
-        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-          <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
-
-          <link itemprop="availability" href="http://schema.org/{% if current_variant.available %}InStock{% else %}OutOfStock{% endif %}">
-
-          <p class="product-single__prices">
-            {% if product.compare_at_price_max > product.price %}
-              <span id="ComparePriceA11y" class="visually-hidden">{{ 'products.product.sale_price' | t }}</span>
-            {% else %}
-              <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
-            {% endif %}
-            <span id="ProductPrice" class="product-single__price" itemprop="price" content="{{ current_variant.price | divided_by: 100.00 }}">
-              {{ current_variant.price | money }}
-            </span>
-
-            {% if product.compare_at_price_max > product.price %}
-              <span id="PriceA11y" class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
-              <s class="product-single__price--compare" id="ComparePrice">
-                {{ current_variant.compare_at_price | money }}
-              </s>
-            {% endif %}
-
-            {% include 'product-unit-price', variant: current_variant, available: true %}
-          </p>
-
-          {%- if cart.taxes_included or shop.shipping_policy.body != blank -%}
-            <div class="product-single__policies rte">
-              {%- if cart.taxes_included -%}
-                {{ 'products.product.include_taxes' | t }}
-              {%- endif -%}
-              {%- if shop.shipping_policy.body != blank -%}
-                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
-              {%- endif -%}
-            </div>
-          {%- endif -%}
-          {%- assign productClasses = 'product-form' -%}
-          {%- if product.has_only_default_variant -%}
-            {%- assign productClasses = productClasses | append: ' product-form--default-variant-only' -%}
-          {%- endif -%}
-
-          {% form 'product', product, class: productClasses %}
-            {{ form | payment_terms }}
-            <select name="id" id="ProductSelect-{{ section.id }}" class="product-single__variants">
-              {% for variant in product.variants %}
-                {% if variant.available %}
-                  <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} data-sku="{{ variant.sku }}" value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money_with_currency }}</option>
-                {% else %}
-                  <option disabled="disabled">
-                    {{ variant.title }} - {{ 'products.product.sold_out' | t }}
-                  </option>
-                {% endif %}
-              {% endfor %}
-            </select>
-
-            {% if section.settings.product_quantity_enable %}
-              <div class="product-single__quantity">
-                <label for="Quantity">{{ 'products.product.quantity' | t }}</label>
-                <input type="number" id="Quantity" name="quantity" value="1" min="1">
-              </div>
-            {% endif %}
-
-            <div class="product-single__cart-submit-wrapper{% if section.settings.enable_payment_button %} product-single__shopify-payment-btn{% endif %}{% if section.settings.add_to_cart_width == 'full_width' %} product-form--full{% endif %}">
-              <button type="submit" name="add" id="AddToCart" class="btn product-single__cart-submit{% if section.settings.add_to_cart_width == 'full_width' %} btn--full{% endif %}{% if section.settings.enable_payment_button and product.selling_plan_groups == empty %} shopify-payment-btn btn--secondary{% endif %}" data-cart-url="{{ routes.cart_url }}">
-                <span id="AddToCartText">{{ 'products.product.add_to_cart' | t }}</span>
-              </button>
-              {% if section.settings.enable_payment_button %}
-                {{ form | payment_button }}
-              {% endif %}
-            </div>
-
-          {% endform %}
-
-        </div>
 
         {% if section.settings.product_description_position == 'right' %}
           {%- assign position = 'right' -%}

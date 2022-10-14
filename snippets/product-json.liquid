@@ -1,0 +1,102 @@
+{% liquid
+  assign metafields_namespaces = "details" | split: ','
+%}
+{
+  "current_variant": {{ product.selected_or_first_available_variant | json}},
+  "available": {{ product.available | json }},
+  "product_template": {{ product.template_suffix | json }},
+  "compare_at_price": {{ product.compare_at_price | json }},
+  "price_varies": {{ product.price_varies | json }},
+  "compare_at_price_max": {{ product.compare_at_price_max | json }},
+  "compare_at_price_min": {{ product.compare_at_price_min | json }},
+  "description": {{ product.description | json }},
+  "featured_image": {{ product.featured_image | json }},
+  "handle": {{ product.handle | json }},
+  "id": {{ product.id | json }},
+  "images": {{ product.images | json }},
+  "media": {{ product.media | json }},
+  "options": [
+    {% for option in product.options_with_values %}
+      {{ option | json }}
+      {%- unless forloop.last -%},{%- endunless -%}
+    {% endfor %}
+  ],
+  "title": {{ product.title | json }},
+  "price": {{ product.price | json }},
+  "price_min": {{ product.price_min | json }},
+  "price_max": {{ product.price_max | json }},
+  "url": {{ product.url | json }},
+  "vendor": {{ product.vendor | json }},
+  "tags": {{ product.tags | json }},
+  "metafields": {
+    {% for namespace in metafields_namespaces %}
+      "{{ namespace }}": {
+      {% for field in product.metafields[namespace] %}
+        {% assign key = field | first %}
+        "{{ key }}" : {% case product.metafields[namespace][key].type %}
+        {% when 'boolean' %}
+          {{ field | last }}
+        {% when 'json' %}
+          {{ field | last }}
+        {% when 'list.single_line_text_field' %}
+          {{ field | last }}
+        {% when 'multi_line_text_field' %}
+          {{ field | last | escape | newline_to_br | json }}
+        {% when 'list.product_reference' %}
+          {{ field | last }}
+        {% when 'product_reference' %}
+          {% if product.metafields[namespace][key].value != blank %}
+            {
+              "featured_image": {{ product.metafields[namespace][key].value.featured_image | json }},
+              "title": {{ product.metafields[namespace][key].value.title | json }},
+              "id": {{ product.metafields[namespace][key].value.id | json }},
+              "variants": {{ product.metafields[namespace][key].value.variants | json }},
+              "price": {{ product.metafields[namespace][key].value.price | json }}
+            }
+          {% else %}
+            false
+          {% endif %}
+        {% when 'file_reference' %}
+          {{ field | last | file_url | json }}
+        {% else %}
+          {{ field | last | json }}
+        {% endcase %}
+        {%- unless forloop.last -%},{%- endunless -%}
+      {% endfor %}
+      }
+      {%- unless forloop.last -%},{%- endunless -%}
+    {% endfor %}
+  },
+  "selected_or_first_available_variant": {{ product.selected_or_first_available_variant.id | json }},
+  "has_only_default_variant": {{ product.has_only_default_variant }},
+  "type": "{{ product.type }}",
+  "variants": [
+    {% for variant in product.variants %}
+      {
+        "barcode": {{ variant.barcode | json }},
+        "compare_at_price": {{ variant.compare_at_price | json }},
+        "featured_media": {{ variant.featured_media | json }},
+        "id": {{ variant.id | json }},
+        "product_id": {{ product.id | json }},
+        "inventory_management": {{ variant.inventory_management | json }},
+        "name": {{ variant | json }},
+        "option1": {{ variant.option1 | json }},
+        "option2": {{ variant.option2 | json }},
+        "option3": {{ variant.option3 | json }},
+        "options": [
+          {% for option in variant.options %}
+            {{ option | json }}{%- unless forloop.last -%},{%- endunless -%}
+          {% endfor %}
+        ],
+        "sku": {{ variant.sku | json }},
+        "title": {{ variant.title | json }},
+        "available": {{ variant.available | json }},
+        "price": {{ variant.price | json }},
+        "quantity": {{ variant.inventory_quantity | json }},
+        "inventory_policy": {{ variant.inventory_policy | json }},
+        "image": {{ variant.featured_media | default: product.featured_media | json }}
+      }
+      {%- unless forloop.last -%},{%- endunless -%}
+    {% endfor %}
+  ]
+}

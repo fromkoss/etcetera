@@ -1,0 +1,90 @@
+<script src="{{ 'featured_collections.min.js' | asset_url }}" defer="defer"></script>
+{{ 'featured-collections.min.css' | asset_url | stylesheet_tag }}
+<link
+        rel="stylesheet"
+        type="text/css"
+        charset="UTF-8"
+        href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css"
+/>
+<link
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
+/>
+
+<script id="featured-collections-data" type="application/json">
+  {
+    "tabs": [
+      {% for block in section.blocks %}
+        {
+          "title": "{{ block.settings.collection.title }}",
+          "products": [
+            {% for product in block.settings.collection.products %}
+              {% render 'product-json', product: product %}
+              {% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        }
+        {% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ],
+    "items_desktop": {{ section.settings.items_desktop | json }},
+    "items_mobile": {{ section.settings.items_mobile | json }},
+    "show_cart_btn": {{ section.settings.show_cart_btn | json }}
+
+  }
+</script>
+
+<div id="featured-collections">
+
+</div>
+
+{% schema %}
+{
+  "name": "Slider tabs",
+  "settings": [
+    {
+      "type": "range",
+      "id": "items_desktop",
+      "label": "Products per slide on Desktop",
+      "default": 3,
+      "min": 2,
+      "max": 10,
+      "step": 1
+    },
+    {
+      "type": "range",
+      "id": "items_mobile",
+      "label": "Products per slide on Mobile",
+      "default": 1,
+      "min": 1,
+      "max": 5,
+      "step": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_btn",
+      "label": "Show 'add to cart' btn",
+      "default": true
+    }
+  ],
+  "max_blocks": 2,
+  "blocks": [
+    {
+      "name": "Tab",
+      "type": "tab",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Slider tabs"
+  }]
+}
+{% endschema %}

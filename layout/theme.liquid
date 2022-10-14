@@ -73,6 +73,8 @@
 
   {{ 'jquery-1.11.0.min.js' | asset_url | script_tag }}
   {{ 'modernizr.min.js' | asset_url | script_tag }}
+  {{ 'global.min.css' | asset_url | stylesheet_tag }}
+  {{ 'global.min.js' | asset_url | script_tag }}
 
   <script src="{{ 'lazysizes.min.js' | asset_url }}" async="async"></script>
 
@@ -128,6 +130,25 @@
       window.theme = window.theme || {};
       theme.moneyFormat = {{ shop.money_format | json }};
       theme.productSingleObject = {{ product | json }};
+      window.translations = {
+        cart: {
+          enterCode: `{{'cart.general.enter_code' | t}}`,
+          continueShopping: `{{'cart.general.continue_shopping' | t}}`
+        },
+        product:{
+          addToCart: `{{'products.product.add_to_cart' | t}}`,
+          viewCart: `{{'products.product.view_cart' | t}}`,
+          inStock: `{{'products.product.in_stock' | t}}`,
+          backInStock: `{{'products.product.notify_in_stock' | t}}`,
+          submit: `{{'products.product.submit' | t}}`,
+          details: `{{'products.product.details' | t}}`,
+        },
+        newsletter: {
+          email: `{{'general.newsletter_form.newsletter_placeholder' | t}}`,
+          contactUs: `{{'general.newsletter_form.contact_us' | t}}`,
+        }
+      }
+      window.loaderUrl = `{{'loader.svg' | asset_url}}`;
     </script>
   {% endif %}
 
@@ -137,5 +158,7 @@
   </ul>
 
   {{ 'theme.js' | asset_url | script_tag }}
+  {% section 'product-badges' %}
+  <div id="modals-container"></div>
 </body>
 </html>
